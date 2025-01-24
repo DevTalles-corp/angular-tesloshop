@@ -62,7 +62,11 @@
           }
         </td>
         <th>
-          <button class="btn btn-ghost text-accent btn-xs">Detalles</button>
+          <a
+            [routerLink]="['/admin/products', product.id]"
+            class="btn btn-ghost text-accent btn-xs"
+            >Detalles</a
+          >
         </th>
       </tr>
       }
