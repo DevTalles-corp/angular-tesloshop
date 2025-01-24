@@ -1,0 +1,71 @@
+<div class="overflow-x-auto bg-gray-900 rounded-2xl p-4">
+  <table class="table">
+    <!-- head -->
+    <thead>
+      <tr>
+        <th>
+          <label>
+            <input type="checkbox" class="checkbox" />
+          </label>
+        </th>
+        <th>Título</th>
+        <th>Precio</th>
+        <th>Inventario</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- row 1 -->
+      @for (product of products(); track $index) {
+      <tr>
+        <th>
+          <label>
+            <input type="checkbox" class="checkbox" />
+          </label>
+        </th>
+        <td>
+          <div class="flex items-center gap-3 w-[350px]">
+            <div class="avatar">
+              <div class="mask mask-squircle h-12 w-12">
+                <img
+                  [src]="product.images | productImage"
+                  alt="Avatar Tailwind CSS Component"
+                />
+              </div>
+            </div>
+            <div>
+              <a
+                [routerLink]="['/admin/products', product.id]"
+                class="font-bold hover:text-accent transition-colors duration-300"
+                >{{ product.title }}</a
+              >
+              <div class="text-sm opacity-50">
+                {{ product.sizes.join(", ") }}
+              </div>
+            </div>
+          </div>
+        </td>
+        <td>
+          {{ product.price | currency }}
+        </td>
+        <td>
+          @if( product.stock <= 10 ) {
+          <span class="badge badge-error">{{ product.stock }}</span>
+          }
+          <!--  -->
+          @else if( product.stock <= 20 ) {
+          <span class="badge badge-warning">{{ product.stock }}</span>
+          }
+          <!--  -->
+          @else {
+          <span class="badge badge-success">{{ product.stock }}</span>
+          }
+        </td>
+        <th>
+          <button class="btn btn-ghost text-accent btn-xs">Detalles</button>
+        </th>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
