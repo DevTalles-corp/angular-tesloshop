@@ -9,12 +9,16 @@ export const adminDashboardRoutes: Routes = [
     component: AdminDashboardLayoutComponent,
     children: [
       {
-        path: '',
+        path: 'products',
         component: ProductsAdminPageComponent,
       },
       {
         path: 'products/:id',
         component: ProductAdminPageComponent,
+      },
+      {
+        path: '**',
+        redirectTo: 'products',
       },
     ],
   },
