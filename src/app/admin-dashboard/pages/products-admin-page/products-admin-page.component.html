@@ -5,13 +5,26 @@
 </h3>
 <div class="divider"></div>
 
-<div class="flex justify-end mb-2">
+<div class="flex gap-2 items-center h-20">
+  <app-pagination
+    [pages]="productsResource.value()?.pages ?? 0"
+    [currentPage]="paginationService.currentPage()"
+  />
+
+  <select
+    class="select select-bordered w-32"
+    (change)="productsPerPage.set(+selectPerPage.value)"
+    #selectPerPage
+  >
+    <option value="10">10</option>
+    <option value="20">20</option>
+    <option value="50">50</option>
+    <option value="100">100</option>
+  </select>
+
+  <div class="flex-1"></div>
+
   <button class="btn btn-primary">Nuevo producto</button>
 </div>
-
-<app-pagination
-  [pages]="productsResource.value()?.pages ?? 0"
-  [currentPage]="paginationService.currentPage()"
-/>
 
 <product-table [products]="productsResource.value()?.products ?? []" />
