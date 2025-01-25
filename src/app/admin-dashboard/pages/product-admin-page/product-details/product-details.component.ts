@@ -1,7 +1,14 @@
 // HTML
 // https://gist.github.com/Klerith/4a2e8b17e9a34bd945f3e393cee2ced9
 
-import { Component, computed, inject, input, OnInit } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -9,7 +16,7 @@ import { ProductCarouselComponent } from '@products/components/product-carousel/
 import { Product, Size } from '@products/interfaces/product.interface';
 import { ProductsService } from '@products/services/products.service';
 import { FormErrorLabelComponent } from '@shared/components/form-error-label/form-error-label.component';
-import { firstValueFrom } from 'rxjs';
+import { async, firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'product-details',
@@ -24,6 +31,8 @@ export class ProductDetailsComponent implements OnInit {
   product = input.required<Product>();
   productsService = inject(ProductsService);
   router = inject(Router);
+
+  wasSaved = signal(false);
 
   fb = inject(FormBuilder);
 
@@ -46,6 +55,9 @@ export class ProductDetailsComponent implements OnInit {
   });
 
   sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
+  imageFiles: FileList | undefined = undefined;
+  tempImages = signal<string[]>([]);
 
   ngOnInit(): void {
     this.setFormValue(this.product());
@@ -80,12 +92,21 @@ export class ProductDetailsComponent implements OnInit {
       this.setFormValue(product);
     } else {
       await firstValueFrom(
-        this.productsService.updateProduct(this.product().id, productLike)
+        this.productsService.updateProduct(
+          this.product().id,
+          productLike,
+          this.imageFiles
+        )
       );
       this.router.navigate(['/admin/products', this.product().id], {
         replaceUrl: true,
       });
     }
+
+    this.wasSaved.set(true);
+    setTimeout(() => {
+      this.wasSaved.set(false);
+    }, 2000);
   }
 
   onSizeClick(size: string) {
@@ -98,5 +119,20 @@ export class ProductDetailsComponent implements OnInit {
     }
 
     this.productForm.patchValue({ sizes: currentSizes });
+  }
+
+  onFileChange(event: Event) {
+    const files = (event.target as HTMLInputElement).files;
+    this.imageFiles = files ?? undefined;
+
+    // Añadir las imagenes al arreglo de images del producto para verlas
+    const imageUrls = Array.from(files ?? []).map((file) =>
+      URL.createObjectURL(file)
+    );
+
+    console.log(imageUrls);
+    this.tempImages.set(imageUrls);
+
+    // this.productForm.patchValue({ images: imageUrls });
   }
 }

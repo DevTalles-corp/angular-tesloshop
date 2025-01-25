@@ -6,7 +6,17 @@ import {
   Product,
   ProductsResponse,
 } from '@products/interfaces/product.interface';
-import { delay, Observable, of, pipe, tap } from 'rxjs';
+import {
+  delay,
+  firstValueFrom,
+  forkJoin,
+  map,
+  Observable,
+  of,
+  pipe,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 const baseUrl = environment.baseUrl;
@@ -81,10 +91,30 @@ export class ProductsService {
     );
   }
 
-  updateProduct(id: string, product: Partial<Product>): Observable<Product> {
-    return this.http
-      .patch<Product>(`${baseUrl}/products/${id}`, product)
-      .pipe(tap((product) => this.updateProductCache(id, product)));
+  updateProduct(
+    id: string,
+    product: Partial<Product>,
+    images?: FileList
+  ): Observable<Product> {
+    // if (images) {
+    //   const imagesNames = await firstValueFrom(this.uploadImages(id, images));
+    //   product.images = imagesNames;
+    // }
+
+    return this.uploadImages(images).pipe(
+      map((imagesNames) => ({
+        ...product,
+        images: [...(product.images ?? []), ...imagesNames],
+      })),
+      switchMap((product) =>
+        this.http.patch<Product>(`${baseUrl}/products/${id}`, product)
+      ),
+      tap((product) => this.updateProductCache(id, product))
+    );
+
+    // return this.http
+    //   .patch<Product>(`${baseUrl}/products/${id}`, product)
+    //   .pipe(tap((product) => this.updateProductCache(id, product)));
   }
 
   createProduct(product: Partial<Product>): Observable<Product> {
@@ -101,5 +131,27 @@ export class ProductsService {
         currentProduct.id === id ? product : currentProduct
       );
     });
+  }
+
+  // !Carga de imágenes
+  uploadImages(images?: FileList): Observable<string[]> {
+    if (!images) return of([]);
+
+    const uploadObservables = Array.from(images).map((image) =>
+      this.uploadImage(image)
+    );
+
+    return forkJoin(uploadObservables).pipe(
+      tap((imagesNames) => console.log({ imagesNames }))
+    );
+  }
+
+  uploadImage(image: File): Observable<string> {
+    const formData = new FormData();
+    formData.append('file', image);
+
+    return this.http
+      .post<{ secureUrl: string }>(`${baseUrl}/files/product`, formData)
+      .pipe(map((resp) => resp.secureUrl.split('/').pop()!));
   }
 }
