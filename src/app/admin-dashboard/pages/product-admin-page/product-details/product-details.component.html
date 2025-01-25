@@ -14,38 +14,57 @@
       placeholder="Título"
       class="input input-bordered w-full"
       formControlName="title"
+      [class.border-red-500]="productForm.get('title')?.errors ?? false"
     />
+
+    <form-error-label [control]="productForm.get('title')!" />
 
     <input
       type="text"
       placeholder="Slug"
       class="input input-bordered w-full"
       formControlName="slug"
+      [class.border-red-500]="productForm.get('slug')?.errors ?? false"
     />
+
+    <form-error-label [control]="productForm.get('slug')!" />
 
     <textarea
       class="textarea textarea-bordered"
       placeholder="Descripción"
       rows="6"
       formControlName="description"
+      [class.border-red-500]="productForm.get('description')?.errors ?? false"
     ></textarea>
+
+    <form-error-label [control]="productForm.get('description')!" />
 
     <h2 class="text-lg font-bold">Datos de venta</h2>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-      <input
-        type="number"
-        placeholder="Precio"
-        class="input input-bordered w-full"
-        formControlName="price"
-      />
+      <div>
+        <input
+          type="number"
+          placeholder="Precio"
+          class="input input-bordered w-full"
+          formControlName="price"
+          [class.border-red-500]="productForm.get('price')?.errors ?? false"
+        />
 
-      <input
-        type="number"
-        placeholder="Inventario"
-        class="input input-bordered w-full"
-        formControlName="stock"
-      />
+        <form-error-label [control]="productForm.get('price')!" />
+      </div>
+
+      <div>
+        <input
+          type="number"
+          placeholder="Inventario"
+          class="input input-bordered w-full"
+          formControlName="stock"
+          [class.border-red-500]="productForm.get('stock')?.errors ?? false"
+        />
+
+        <form-error-label [control]="productForm.get('stock')!" />
+      </div>
     </div>
 
     <!-- tags -->
@@ -54,7 +73,10 @@
       placeholder="Tags"
       class="input input-bordered w-full"
       formControlName="tags"
+      [class.border-red-500]="productForm.get('tags')?.errors ?? false"
     />
+
+    <form-error-label [control]="productForm.get('tags')!" />
 
     <!-- Botones para el género -->
     <div class="grid grid-cols-4 gap-2">
