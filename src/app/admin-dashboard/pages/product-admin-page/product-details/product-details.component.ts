@@ -4,10 +4,12 @@
 import { Component, computed, inject, input, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ProductCarouselComponent } from '@products/components/product-carousel/product-carousel.component';
 import { Product, Size } from '@products/interfaces/product.interface';
 import { ProductsService } from '@products/services/products.service';
 import { FormErrorLabelComponent } from '@shared/components/form-error-label/form-error-label.component';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'product-details',
@@ -21,6 +23,7 @@ import { FormErrorLabelComponent } from '@shared/components/form-error-label/for
 export class ProductDetailsComponent implements OnInit {
   product = input.required<Product>();
   productsService = inject(ProductsService);
+  router = inject(Router);
 
   fb = inject(FormBuilder);
 
@@ -45,11 +48,15 @@ export class ProductDetailsComponent implements OnInit {
   sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
   ngOnInit(): void {
-    this.productForm.patchValue(this.product() as any);
-    this.productForm.patchValue({ tags: this.product().tags.join(', ') });
+    this.setFormValue(this.product());
   }
 
-  onSubmit() {
+  setFormValue(formLike: Partial<Product>) {
+    this.productForm.patchValue(formLike as any);
+    this.productForm.patchValue({ tags: formLike.tags?.join(', ') });
+  }
+
+  async onSubmit() {
     this.productForm.markAllAsTouched();
     const formValue = this.productForm.value;
 
@@ -65,12 +72,20 @@ export class ProductDetailsComponent implements OnInit {
     };
 
     // console.log(productLike);
-
-    this.productsService
-      .updateProduct(this.product().id, productLike)
-      .subscribe((product) => {
-        console.log({ product });
+    if (this.product().id === 'new') {
+      const product = await firstValueFrom(
+        this.productsService.createProduct(productLike)
+      );
+      this.router.navigate(['/admin/products', product.id]);
+      this.setFormValue(product);
+    } else {
+      await firstValueFrom(
+        this.productsService.updateProduct(this.product().id, productLike)
+      );
+      this.router.navigate(['/admin/products', this.product().id], {
+        replaceUrl: true,
       });
+    }
   }
 
   onSizeClick(size: string) {

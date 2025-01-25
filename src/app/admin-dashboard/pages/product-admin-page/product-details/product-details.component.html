@@ -82,6 +82,7 @@
     <div class="grid grid-cols-4 gap-2">
       <!-- <button class="btn btn-sm btn-outline">Masculino</button> -->
       <button
+        type="button"
         [class.btn-primary]="productForm.value.gender === 'men'"
         class="btn btn-sm"
         (click)="productForm.patchValue({ gender: 'men' })"
@@ -89,6 +90,7 @@
         Masculino
       </button>
       <button
+        type="button"
         [class.btn-accent]="productForm.value.gender === 'women'"
         class="btn btn-sm"
         (click)="productForm.patchValue({ gender: 'women' })"
@@ -97,6 +99,7 @@
       </button>
 
       <button
+        type="button"
         [class.btn-warning]="productForm.value.gender === 'kid'"
         class="btn btn-sm"
         (click)="productForm.patchValue({ gender: 'kid' })"
@@ -105,6 +108,7 @@
       </button>
 
       <button
+        type="button"
         [class.btn-secondary]="productForm.value.gender === 'unisex'"
         class="btn btn-sm"
         (click)="productForm.patchValue({ gender: 'unisex' })"
@@ -123,6 +127,7 @@
     <div class="grid grid-cols-6 gap-2">
       @for (size of sizes; track size) {
       <button
+        type="button"
         [class.btn-primary]="productForm.value.sizes?.includes(size)"
         class="btn btn-sm"
         (click)="onSizeClick(size)"

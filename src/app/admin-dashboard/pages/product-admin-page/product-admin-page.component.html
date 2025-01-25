@@ -4,12 +4,10 @@
 </div>
 }
 
-<!--  -->
-@if (productResource.error()) {
-<div class="flex justify-center items-center h-screen">
-  <span class="loading loading-spinner loading-lg"></span>
-</div>
-}
+<!-- No hará falta porque se redirige a la pagina de productos -->
+<!-- @if (productResource.error()) {
+<div class="flex justify-center items-center h-screen"></div>
+} -->
 
 <!--  -->
 @if (productResource.hasValue()) {
