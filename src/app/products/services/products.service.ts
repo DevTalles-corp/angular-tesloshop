@@ -6,7 +6,7 @@ import {
   Product,
   ProductsResponse,
 } from '@products/interfaces/product.interface';
-import { delay, Observable, of, pipe, tap } from 'rxjs';
+import { delay, forkJoin, map, Observable, of, pipe, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 const baseUrl = environment.baseUrl;
@@ -112,5 +112,27 @@ export class ProductsService {
     });
 
     console.log('Caché actualizado');
+  }
+
+  // Tome un FileList y lo suba
+  uploadImages(images?: FileList): Observable<string[]> {
+    if (!images) return of([]);
+
+    const uploadObservables = Array.from(images).map((imageFile) =>
+      this.uploadImage(imageFile)
+    );
+
+    return forkJoin(uploadObservables).pipe(
+      tap((imageNames) => console.log({ imageNames }))
+    );
+  }
+
+  uploadImage(imageFile: File): Observable<string> {
+    const formData = new FormData();
+    formData.append('file', imageFile);
+
+    return this.http
+      .post<{ fileName: string }>(`${baseUrl}/files/product`, formData)
+      .pipe(map((resp) => resp.fileName));
   }
 }
